@@ -3,16 +3,12 @@ from datetime import datetime, timedelta
 from jose import jwt
 from passlib.context import CryptContext
 
-# Secret key (change this in production)
-SECRET_KEY = "contractiq_secret_key_2026"
+from src.config import (
+    SECRET_KEY,
+    ALGORITHM,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+)
 
-# JWT Algorithm
-ALGORITHM = "HS256"
-
-# Token expiry time (minutes)
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-# Password hashing
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
