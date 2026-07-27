@@ -1,13 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "http://127.0.0.1:8000"
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
-export const registerUser = (data) => {
-    return API.post("/register", data);
-};
+export const registerUser = (data) => API.post("/register", data);
 
-export const loginUser = (data) => {
-    return API.post("/login", data);
-};
+export const loginUser = (data) => API.post("/login", data);
