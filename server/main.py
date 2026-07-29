@@ -13,6 +13,11 @@ Base.metadata.create_all(bind=engine)
 # Allow the Vite dev server (and any origin during development) to call the API.
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+
+        "http://localhost:5173"
+
+    ],
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -20,7 +25,11 @@ app.add_middleware(
 )
 
 app.include_router(obligations.router)
-
+# Dashboard APIs
+app.include_router(
+    dashboard_router,
+    prefix="/api"
+)
 
 @app.get("/")
 def root():
