@@ -9,6 +9,7 @@ app = FastAPI(title="Obligation Tracker API")
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
+
 # Allow React frontend
 # Allow the Vite dev server (and any origin during development) to call the API.
 app.add_middleware(
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(obligations.router)
 # Dashboard APIs
