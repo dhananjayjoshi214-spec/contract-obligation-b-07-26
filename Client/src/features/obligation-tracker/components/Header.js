@@ -1,19 +1,24 @@
-import { useState } from 'react'
-
-const INITIAL_NOTIFICATIONS = [
-  { id: 1, type: 'warning', title: 'Contract Expiring', body: 'Commercial Lease — HQ Tower A expires in 28 days.', time: '5 min ago', unread: true },
-  { id: 2, type: 'overdue', title: 'Overdue Obligation', body: 'Annual Insurance Certificate Renewal is 3 days overdue.', time: '1 hr ago', unread: true },
-  { id: 3, type: 'info', title: 'Approval Required', body: 'Legal Advisory Consulting Agreement needs your signature.', time: '2 hrs ago', unread: true },
-  { id: 4, type: 'success', title: 'Obligation Completed', body: 'Q2 Lease Payment submitted successfully.', time: '4 hrs ago', unread: false },
-  { id: 5, type: 'warning', title: 'Renewal Reminder', body: 'Enterprise SaaS License — Salesforce renews in 45 days.', time: '1 day ago', unread: false },
-]
+import { useState, useEffect } from 'react'
 
 export default function Header() {
   const [searchFocused, setSearchFocused] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState([])
+
+  useEffect(() => {
+    fetch('/api/notifications')
+      .then((res) => res.json())
+      .then(setNotifications)
+      .catch(() => setNotifications([]))
+  }, [])
 
   const unreadCount = notifications.filter((n) => n.unread).length
+
+  const markAllRead = () => {
+    fetch('/api/notifications/mark-all-read', { method: 'PATCH' }).then(() =>
+      setNotifications((ns) => ns.map((n) => ({ ...n, unread: false })))
+    )
+  }
 
   return (
     <header className="header">
@@ -44,10 +49,7 @@ export default function Header() {
               <div className="notif-panel-header">
                 <span>Notifications</span>
                 <div className="notif-panel-actions">
-                  <button
-                    className="notif-link"
-                    onClick={() => setNotifications((ns) => ns.map((n) => ({ ...n, unread: false })))}
-                  >
+                  <button className="notif-link" onClick={markAllRead}>
                     Mark all read
                   </button>
                   <button className="notif-close" onClick={() => setNotifOpen(false)}>
@@ -57,6 +59,9 @@ export default function Header() {
               </div>
 
               <div className="notif-list">
+                {notifications.length === 0 && (
+                  <p style={{ padding: '16px', fontSize: '13px', color: '#6b7280' }}>No notifications yet.</p>
+                )}
                 {notifications.map((n) => (
                   <div key={n.id} className="notif-item">
                     <NotificationIcon type={n.type} />
@@ -92,37 +97,10 @@ export default function Header() {
 }
 
 function NotificationIcon({ type }) {
-  if (type === 'warning') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" className="notif-icon">
-        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
-        <line x1="12" y1="9" x2="12" y2="13" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
-    )
-  }
-  if (type === 'overdue') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" className="notif-icon">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-    )
-  }
-  if (type === 'success') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" className="notif-icon">
-        <circle cx="12" cy="12" r="10" />
-        <path d="m9 12 2 2 4-4" />
-      </svg>
-    )
-  }
+  const stroke = type === 'warning' ? '#f59e0b' : type === 'overdue' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" className="notif-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2" className="notif-icon">
       <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
     </svg>
   )
 }
@@ -163,3 +141,11 @@ function LogoutIcon() {
     </svg>
   )
 }
+  
+            
+              
+
+       
+    
+  
+     
