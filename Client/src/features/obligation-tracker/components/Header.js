@@ -6,11 +6,14 @@ export default function Header() {
   const [notifications, setNotifications] = useState([])
 
   useEffect(() => {
-    fetch('/api/notifications')
-      .then((res) => res.json())
-      .then(setNotifications)
-      .catch(() => setNotifications([]))
-  }, [])
+  fetch('/api/notifications')
+    .then((res) => {
+      if (!res.ok) throw new Error('Not found')
+      return res.json()
+    })
+    .then((data) => setNotifications(Array.isArray(data) ? data : []))
+    .catch(() => setNotifications([]))
+}, [])
 
   const unreadCount = notifications.filter((n) => n.unread).length
 
