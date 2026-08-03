@@ -1,7 +1,8 @@
-﻿node_modules/
+node_modules/
+build/
+.env
 __pycache__/
 *.pyc
-# Environment files
-.env
-Client/.env
-server/.env
+.pytest_cache/
+*.db
+.DS_Store
