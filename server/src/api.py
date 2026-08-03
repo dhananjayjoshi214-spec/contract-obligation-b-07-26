@@ -1,10 +1,9 @@
-from fastapi import APIRouter
-from src.renewals.controller import router as renewals_router
+from fastapi import FastAPI
 
-api_router = APIRouter()
+from src.contracts.controller import router as contracts_router
+from src.obligations.controller import router as obligations_router
 
-# Register the renewals endpoint we just created
-api_router.include_router(renewals_router)
 
-# (If your todos or users files are also empty right now, leave them alone. 
-# We only need renewals to work for your deadline today!)
+def register_routes(app: FastAPI):
+    app.include_router(contracts_router)
+    app.include_router(obligations_router)
