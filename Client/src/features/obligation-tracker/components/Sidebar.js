@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const NAV_SECTIONS = [
   {
@@ -22,6 +22,17 @@ const NAV_SECTIONS = [
 
 export default function Sidebar({ activeKey = 'obligations' }) {
   const [collapsed, setCollapsed] = useState(false)
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then((res) => {
+        if (!res.ok) throw new Error('Not found')
+        return res.json()
+      })
+      .then((data) => setUser(data))
+      .catch(() => setUser(null))
+  }, [])
 
   if (collapsed) {
     return (
@@ -44,8 +55,14 @@ export default function Sidebar({ activeKey = 'obligations' }) {
 
       <div className="sidebar-user">
         <span className="sidebar-user-label">SIGNED IN AS</span>
-        <span className="sidebar-user-name">Sarah Chen</span>
-        <span className="sidebar-user-role">Legal Manager</span>
+        {user ? (
+          <>
+            <span className="sidebar-user-name">{user.name}</span>
+            <span className="sidebar-user-role">{user.role}</span>
+          </>
+        ) : (
+          <span className="sidebar-user-name" style={{ color: '#64748b' }}>No user found</span>
+        )}
       </div>
 
       <nav className="sidebar-nav">
@@ -144,3 +161,6 @@ function NavIcon({ name }) {
       return null
   }
 }
+
+          
+  
