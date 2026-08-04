@@ -5,31 +5,6 @@ import { SectionLabel } from "../../../components/SectionLabel";
 import { Badge, statusBadge, priorityBadge } from "../../../components/Badge";
 import { useContract } from "../hooks/useContract";
 
-// Static illustrative data — approval workflow / version history aren't modeled
-// on the backend yet; wire these up to real endpoints when that data exists.
-const APPROVAL_STEPS = [
-  { step: "Drafting", status: "completed", person: "Lisa Torres", date: "Dec 1, 2023" },
-  { step: "Legal Review", status: "completed", person: "Sarah Chen", date: "Jan 8, 2024" },
-  { step: "Compliance Check", status: "completed", person: "David Park", date: "Jan 12, 2024" },
-  { step: "Executive Approval", status: "completed", person: "Michael Grant — CEO", date: "Jan 14, 2024" },
-  { step: "Counterparty Execution", status: "completed", person: "Accenture LLP", date: "Jan 15, 2024" },
-  { step: "Active Monitoring", status: "current", person: "Sarah Chen", date: "Ongoing" },
-];
-
-const VERSIONS = [
-  { ver: "v3.0", date: "Jan 15, 2024", author: "Sarah Chen", note: "Final executed version — fully signed" },
-  { ver: "v2.1", date: "Jan 10, 2024", author: "David Park", note: "Legal revisions — amended clause 8.2 liability cap" },
-  { ver: "v2.0", date: "Dec 20, 2023", author: "Sarah Chen", note: "Counterparty redlines incorporated" },
-  { ver: "v1.0", date: "Dec 1, 2023", author: "Lisa Torres", note: "Initial draft" },
-];
-
-const DOCUMENTS = [
-  { name: "MSA_Accenture_v3.0_Executed.pdf", size: "2.4 MB", date: "Jan 15, 2024", type: "PDF" },
-  { name: "SOW_v2.3_IT_Consulting.pdf", size: "1.1 MB", date: "Jan 15, 2024", type: "PDF" },
-  { name: "Exhibit_A_Pricing_Schedule.xlsx", size: "380 KB", date: "Jan 10, 2024", type: "XLSX" },
-  { name: "Legal_Review_Notes_v2.1.docx", size: "245 KB", date: "Jan 10, 2024", type: "DOCX" },
-];
-
 export function ContractDetail({ contractId, onBack }) {
   const { contract, obligations, loading, error } = useContract(contractId);
   const [activeTab, setActiveTab] = useState("overview");
@@ -48,6 +23,12 @@ export function ContractDetail({ contractId, onBack }) {
     );
   }
 
+  const approvalSteps = contract.approvalSteps || [];
+  const versions = contract.versions || [];
+  const documents = contract.documents || [];
+  const keyTerms = contract.keyTerms || [];
+  const duration = contract.duration || {};
+
   return (
     <div className="p-6 space-y-4 max-w-screen-xl">
       <div className="flex items-start gap-4 flex-wrap">
@@ -62,7 +43,7 @@ export function ContractDetail({ contractId, onBack }) {
             <h1 className="text-base font-bold text-foreground">{contract.name}</h1>
             {statusBadge(contract.status)}
             <Badge variant="neutral">{contract.id}</Badge>
-            <Badge variant="neutral">v3.0</Badge>
+            {contract.currentVersion && <Badge variant="neutral">{contract.currentVersion}</Badge>}
           </div>
           <p className="text-xs text-muted-foreground">
             {contract.type} · {contract.party} · Owner: {contract.owner}
@@ -111,7 +92,7 @@ export function ContractDetail({ contractId, onBack }) {
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{item.label}</p>
-                    <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                    <p className="text-sm font-semibold text-foreground">{item.value ?? "—"}</p>
                   </div>
                 ))}
               </div>
@@ -119,17 +100,15 @@ export function ContractDetail({ contractId, onBack }) {
             <Card className="p-5">
               <SectionLabel>Key Terms</SectionLabel>
               <div className="space-y-3">
-                {[
-                  { term: "Payment Terms", detail: "Net-30 from invoice date. Late payment fee of 1.5% per month after 30 days." },
-                  { term: "Scope of Services", detail: "Enterprise IT consulting, managed services, and digital transformation advisory per SOW v2.3." },
-                  { term: "Termination Clause", detail: "Either party may terminate with 90 days written notice. Immediate termination for material breach with 15-day cure period." },
-                  { term: "Liability Cap", detail: "Limited to 12 months of fees paid in the preceding 12-month period. Excludes IP infringement and gross negligence." },
-                ].map((t) => (
+                {keyTerms.map((t) => (
                   <div key={t.term} className="border-l-2 border-blue-200 pl-3.5">
                     <p className="text-xs font-semibold text-foreground">{t.term}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{t.detail}</p>
                   </div>
                 ))}
+                {keyTerms.length === 0 && (
+                  <p className="text-xs text-muted-foreground py-2">No key terms recorded for this contract.</p>
+                )}
               </div>
             </Card>
           </div>
@@ -140,10 +119,12 @@ export function ContractDetail({ contractId, onBack }) {
               <div className="mb-3">
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-muted-foreground">Elapsed</span>
-                  <span className="font-mono font-semibold text-foreground">35%</span>
+                  <span className="font-mono font-semibold text-foreground">
+                    {duration.elapsedPercent != null ? `${duration.elapsedPercent}%` : "—"}
+                  </span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: "35%" }} />
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${duration.elapsedPercent ?? 0}%` }} />
                 </div>
                 <div className="flex justify-between text-xs mt-1 text-muted-foreground">
                   <span>{contract.effective}</span>
@@ -152,13 +133,13 @@ export function ContractDetail({ contractId, onBack }) {
               </div>
               <div className="space-y-2 pt-2 border-t border-border">
                 {[
-                  { label: "Days Elapsed", value: "255" },
-                  { label: "Days Remaining", value: "475" },
-                  { label: "Total Duration", value: "730 days" },
+                  { label: "Days Elapsed", value: duration.daysElapsed },
+                  { label: "Days Remaining", value: duration.daysRemaining },
+                  { label: "Total Duration", value: duration.totalDays != null ? `${duration.totalDays} days` : undefined },
                 ].map((item) => (
                   <div key={item.label} className="flex justify-between text-xs">
                     <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-mono font-semibold text-foreground">{item.value}</span>
+                    <span className="font-mono font-semibold text-foreground">{item.value ?? "—"}</span>
                   </div>
                 ))}
               </div>
@@ -167,7 +148,7 @@ export function ContractDetail({ contractId, onBack }) {
             <Card className="p-5">
               <SectionLabel>Approval Workflow</SectionLabel>
               <div>
-                {APPROVAL_STEPS.map((step, i) => (
+                {approvalSteps.map((step, i) => (
                   <div key={i} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <div
@@ -182,7 +163,7 @@ export function ContractDetail({ contractId, onBack }) {
                         {step.status === "completed" && <CheckCircle size={11} className="text-white" />}
                         {step.status === "current" && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                       </div>
-                      {i < APPROVAL_STEPS.length - 1 && (
+                      {i < approvalSteps.length - 1 && (
                         <div
                           className={`w-px my-0.5 ${step.status === "completed" ? "bg-emerald-300" : "bg-border"}`}
                           style={{ height: 22 }}
@@ -196,6 +177,9 @@ export function ContractDetail({ contractId, onBack }) {
                     </div>
                   </div>
                 ))}
+                {approvalSteps.length === 0 && (
+                  <p className="text-xs text-muted-foreground py-2">No approval workflow recorded for this contract.</p>
+                )}
               </div>
             </Card>
           </div>
@@ -247,7 +231,7 @@ export function ContractDetail({ contractId, onBack }) {
         <Card className="p-5">
           <SectionLabel>Version History</SectionLabel>
           <div className="divide-y divide-border">
-            {VERSIONS.map((v) => (
+            {versions.map((v) => (
               <div key={v.ver} className="flex items-center gap-4 py-3">
                 <Badge variant="neutral">{v.ver}</Badge>
                 <div className="flex-1">
@@ -261,6 +245,9 @@ export function ContractDetail({ contractId, onBack }) {
                 </button>
               </div>
             ))}
+            {versions.length === 0 && (
+              <p className="text-xs text-muted-foreground py-4">No version history for this contract.</p>
+            )}
           </div>
         </Card>
       )}
@@ -269,7 +256,7 @@ export function ContractDetail({ contractId, onBack }) {
         <Card className="p-5">
           <SectionLabel>Attached Documents</SectionLabel>
           <div className="space-y-2">
-            {DOCUMENTS.map((doc) => (
+            {documents.map((doc) => (
               <div key={doc.name} className="flex items-center gap-3 p-3 bg-muted rounded-lg hover:bg-accent transition-colors">
                 <div className="w-8 h-8 bg-card border border-border rounded flex items-center justify-center flex-shrink-0">
                   <Paperclip size={12} className="text-muted-foreground" />
@@ -286,6 +273,9 @@ export function ContractDetail({ contractId, onBack }) {
                 </button>
               </div>
             ))}
+            {documents.length === 0 && (
+              <p className="text-xs text-muted-foreground py-4">No documents attached to this contract.</p>
+            )}
           </div>
         </Card>
       )}
