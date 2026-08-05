@@ -1,4 +1,5 @@
 
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -13,13 +14,24 @@ SessionLocal = sessionmaker(
 )
 
 """Database engine/session setup (SQLite for local dev)."""
+
+"""Database engine/session setup (PostgreSQL)."""
+import os
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./contractiq.db"
+# Set DATABASE_URL in your environment, e.g.:
+# postgresql://<user>:<password>@<host>:<port>/<database>
+SQLALCHEMY_DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://contractiq:contractiq@localhost:5432/contractiq",
+)
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL,
+    pool_pre_ping=True,  # recycles dead connections instead of erroring on stale ones
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
