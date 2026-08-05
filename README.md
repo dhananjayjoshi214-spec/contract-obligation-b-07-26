@@ -1,73 +1,49 @@
-# Obligation Tracker — feature branch
+# ContractIQ
 
-Restructured to match the team's existing repo conventions (Create React App
-under `client/`, feature-folder pattern under `src/features/<feature>/`).
-
-## Structure
+Contract Repository & Obligation Tracking — React frontend + FastAPI backend,
+matching the provided Figma screenshots (Contract Repository list view).
 
 ```
-client/                                  Create React App frontend
-├── package.json                         react-scripts, dev proxy -> localhost:8000
-├── public/
-│   └── index.html
-└── src/
-    ├── index.js                          ReactDOM root render
-    ├── App.js                            top-level app shell
-    ├── assets/
-    │   └── global.css                    all styling (colors, badges, layout)
-    └── features/
-        └── obligation-tracker/
-            ├── ObligationTracker.js       page component (data fetching + view state)
-            ├── hooks/
-            │   └── obligationsApi.js      fetch helpers for the obligations API
-            └── components/
-                ├── Header.js              title, search, notifications, profile
-                ├── Toolbar.js             search, Kanban/List toggle, status counters
-                ├── ListView.js            table view
-                ├── KanbanView.js          5-column board
-                ├── Badges.js              Priority + Status pill components
-                └── Avatar.js              colored initials avatar
-
-server/                                   FastAPI backend
-├── requirements.txt
-├── main.py                                app entrypoint + CORS
-└── app/
-    ├── models.py                          Pydantic models
-    ├── data.py                            seed data (10 sample obligations)
-    └── routers/
-        └── obligations.py                 GET/POST/PATCH/DELETE + /summary
+project-root/
+├── Client/   React frontend
+├── server/   FastAPI backend
 ```
 
-## Running locally
+## Quick start
 
-**Backend**
+**Backend:**
 ```bash
 cd server
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+uvicorn src.main:app --reload
 ```
+Runs on http://localhost:8000 (docs at `/docs`). Seeds the 10 contracts and 5
+obligations from the screenshot into a local SQLite file on first run.
 
-**Frontend**
+**Frontend:**
 ```bash
-cd client
+cd Client
 npm install
+cp .env.example .env
 npm start
 ```
-Runs at `http://localhost:3000`. The `"proxy"` field in `client/package.json`
-forwards `/api/*` calls to the FastAPI backend on port 8000 automatically
-(standard Create React App dev proxy — no extra config needed).
+Runs on http://localhost:3000 and calls the API above.
 
-## Notes on the restructuring
+## What's implemented
 
-- Converted from a standalone Vite app to Create React App conventions to
-  match the rest of the repo (`.js` component files, `public/index.html`,
-  `src/index.js` entry point, `package.json` proxy field instead of a Vite
-  config).
-- Page-specific code now lives under `src/features/obligation-tracker/`,
-  mirroring the existing `features/authentication/` pattern (its own
-  `components/` and `hooks/` subfolders).
-- `hooks/obligationsApi.js` holds the fetch calls, following the same idea as
-  `useSignup.js` / `useVerifyPassword.js` in the authentication feature —
-  data-fetching logic kept separate from the page component itself.
-- Global styles moved to `src/assets/global.css` to match the existing
-  `assets/global.css` convention shown in the repo.
+- **Contract Repository** (`Client/src/features/contracts/components/ContractRepository.js`)
+  — search, type/status filters, summary cards, paginated table — matches screenshot 1:1.
+- **Contract Detail** — Overview / Obligations / Versions / Documents tabs, wired to
+  live contract + obligation data from the API (versions & approval workflow are
+  still frontend-only placeholders since there's no backend model for them yet).
+- **FastAPI backend** — Clean Architecture per module (`contracts`, `obligations`):
+  `controller.py` (routes) → `service.py` (logic) → `models.py` (schemas), with
+  ORM entities in `src/entities/` and SQLite via SQLAlchemy.
+
+## Next steps you'll likely want
+
+- Add auth (guide's folder structure reserves a `Client/src/features/authentication/`
+  slot and `server/src/auth/` module for this — not wired up yet since no login
+  screen was in the screenshots).
+- Add pagination params to `GET /api/contracts` (currently returns full filtered list).
+- Model version history / approval workflow on the backend if those need to be dynamic.
