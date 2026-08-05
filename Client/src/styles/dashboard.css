@@ -1,0 +1,33 @@
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: #111827;
+}
+
+.sidebar button {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.sidebar button:hover {
+  background: #2563eb;
+}
+
+.dashboard-card {
+  border-radius: 18px;
+  border: none;
+}
+
+.navbar {
+  height: 75px;
+}
+
+.stat-card {
+  border: none;
+  border-radius: 16px;
+  transition: .3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}

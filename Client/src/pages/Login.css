@@ -1,0 +1,42 @@
+.login-wrapper{
+    min-height:100vh;
+    background:#F7F9FC;
+}
+
+.left-side{
+    background:#111827;
+    color:white;
+    min-height:100vh;
+    padding:50px;
+}
+
+.left-side h1{
+    font-size:58px;
+    font-weight:700;
+    line-height:1.1;
+}
+
+.left-side p{
+    color:#CBD5E1;
+    font-size:18px;
+}
+
+.login-card{
+    width:480px;
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+    border:none;
+}
+
+.logo-small{
+    width:70px;
+}
+
+.form-control{
+    height:48px;
+}
+
+.btn-primary{
+    height:48px;
+    border-radius:10px;
+}

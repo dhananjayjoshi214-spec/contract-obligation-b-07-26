@@ -1,0 +1,73 @@
+body {
+  background: #f5f7fb;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.auth-card {
+  width: 450px;
+  border-radius: 22px;
+  border: none;
+  padding: 40px;
+  background: white;
+}
+
+.auth-card h1 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.auth-card p {
+  color: #6b7280;
+}
+
+.input-group-text {
+  background: white;
+  border-right: none;
+}
+
+.form-control {
+  border-left: none;
+  height: 52px;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #0d6efd;
+}
+
+.form-select {
+  height: 52px;
+}
+
+.btn-primary {
+  height: 52px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-info,
+.btn-outline-secondary {
+  border-radius: 10px;
+}
+
+.left-panel {
+  background: #0f172a;
+  color: white;
+}
+
+.left-panel h1 {
+  font-size: 52px;
+  font-weight: bold;
+}
+
+.left-panel p {
+  color: #cbd5e1;
+}
+
+.feature-item {
+  margin-top: 18px;
+  font-size: 17px;
+}
