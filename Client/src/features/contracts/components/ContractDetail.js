@@ -1,34 +1,39 @@
 import { useState } from "react";
-import { ChevronLeft, Download, Edit, CheckCircle, Paperclip } from "lucide-react";
+import { ChevronLeft, Download, Edit, FileText } from "lucide-react";
 import { Card } from "../../../components/Card";
 import { SectionLabel } from "../../../components/SectionLabel";
 import { Badge, statusBadge, priorityBadge } from "../../../components/Badge";
 import { useContract } from "../hooks/useContract";
 
-// Static illustrative data — approval workflow / version history aren't modeled
-// on the backend yet; wire these up to real endpoints when that data exists.
-const APPROVAL_STEPS = [
-  { step: "Drafting", status: "completed", person: "Lisa Torres", date: "Dec 1, 2023" },
-  { step: "Legal Review", status: "completed", person: "Sarah Chen", date: "Jan 8, 2024" },
-  { step: "Compliance Check", status: "completed", person: "David Park", date: "Jan 12, 2024" },
-  { step: "Executive Approval", status: "completed", person: "Michael Grant — CEO", date: "Jan 14, 2024" },
-  { step: "Counterparty Execution", status: "completed", person: "Accenture LLP", date: "Jan 15, 2024" },
-  { step: "Active Monitoring", status: "current", person: "Sarah Chen", date: "Ongoing" },
-];
+function formatDate(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
 
-const VERSIONS = [
-  { ver: "v3.0", date: "Jan 15, 2024", author: "Sarah Chen", note: "Final executed version — fully signed" },
-  { ver: "v2.1", date: "Jan 10, 2024", author: "David Park", note: "Legal revisions — amended clause 8.2 liability cap" },
-  { ver: "v2.0", date: "Dec 20, 2023", author: "Sarah Chen", note: "Counterparty redlines incorporated" },
-  { ver: "v1.0", date: "Dec 1, 2023", author: "Lisa Torres", note: "Initial draft" },
-];
+function userLabel(user) {
+  if (!user) return "—";
+  if (typeof user === "string") return user;
+  return [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email || "—";
+}
 
-const DOCUMENTS = [
-  { name: "MSA_Accenture_v3.0_Executed.pdf", size: "2.4 MB", date: "Jan 15, 2024", type: "PDF" },
-  { name: "SOW_v2.3_IT_Consulting.pdf", size: "1.1 MB", date: "Jan 15, 2024", type: "PDF" },
-  { name: "Exhibit_A_Pricing_Schedule.xlsx", size: "380 KB", date: "Jan 10, 2024", type: "XLSX" },
-  { name: "Legal_Review_Notes_v2.1.docx", size: "245 KB", date: "Jan 10, 2024", type: "DOCX" },
-];
+// Computed purely from contracts.start_date / contracts.end_date — there's
+// no stored duration/progress field in the schema.
+function getDurationStats(startDate, endDate) {
+  if (!startDate || !endDate) return null;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const totalDays = Math.max(0, Math.round((end - start) / msPerDay));
+  const daysElapsed = Math.min(totalDays, Math.max(0, Math.round((Date.now() - start.getTime()) / msPerDay)));
+  const daysRemaining = Math.max(0, totalDays - daysElapsed);
+  const elapsedPercent = totalDays === 0 ? 0 : Math.round((daysElapsed / totalDays) * 100);
+
+  return { totalDays, daysElapsed, daysRemaining, elapsedPercent };
+}
 
 export function ContractDetail({ contractId, onBack }) {
   const { contract, obligations, loading, error } = useContract(contractId);
@@ -48,6 +53,10 @@ export function ContractDetail({ contractId, onBack }) {
     );
   }
 
+  const versions = [...(contract.versions || [])].sort((a, b) => b.version_number - a.version_number);
+  const latestVersion = versions[0];
+  const duration = getDurationStats(contract.start_date, contract.end_date);
+
   return (
     <div className="p-6 space-y-4 max-w-screen-xl">
       <div className="flex items-start gap-4 flex-wrap">
@@ -59,18 +68,21 @@ export function ContractDetail({ contractId, onBack }) {
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap mb-1">
-            <h1 className="text-base font-bold text-foreground">{contract.name}</h1>
+            <h1 className="text-base font-bold text-foreground">{contract.title}</h1>
             {statusBadge(contract.status)}
-            <Badge variant="neutral">{contract.id}</Badge>
-            <Badge variant="neutral">v3.0</Badge>
+            <Badge variant="neutral">{contract.contract_no}</Badge>
+            {latestVersion && <Badge variant="neutral">v{latestVersion.version_number}</Badge>}
           </div>
           <p className="text-xs text-muted-foreground">
-            {contract.type} · {contract.party} · Owner: {contract.owner}
+            {contract.category || "Uncategorized"} · Owner: {userLabel(contract.owner)}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-foreground hover:bg-muted transition-colors">
-            <Download size={12} /> Download PDF
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            disabled={!latestVersion}
+          >
+            <Download size={12} /> Download Latest
           </button>
           <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
             <Edit size={12} /> Edit Contract
@@ -79,7 +91,7 @@ export function ContractDetail({ contractId, onBack }) {
       </div>
 
       <div className="flex items-center gap-0 border-b border-border">
-        {["overview", "obligations", "versions", "documents"].map((tab) => (
+        {["overview", "obligations", "versions"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -99,104 +111,67 @@ export function ContractDetail({ contractId, onBack }) {
               <SectionLabel>Contract Metadata</SectionLabel>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {[
-                  { label: "Contract Type", value: contract.type },
-                  { label: "Counterparty", value: contract.party },
-                  { label: "Effective Date", value: contract.effective },
-                  { label: "Expiration Date", value: contract.expiry },
-                  { label: "Contract Value", value: contract.value },
-                  { label: "Assigned Owner", value: contract.owner },
-                  { label: "Governing Law", value: contract.governing_law },
-                  { label: "Jurisdiction", value: contract.jurisdiction },
-                  { label: "Auto-Renewal", value: contract.auto_renewal },
+                  { label: "Contract No.", value: contract.contract_no },
+                  { label: "Category", value: contract.category },
+                  { label: "Status", value: contract.status },
+                  { label: "Start Date", value: formatDate(contract.start_date) },
+                  { label: "End Date", value: formatDate(contract.end_date) },
+                  { label: "Owner", value: userLabel(contract.owner) },
+                  { label: "Created By", value: userLabel(contract.created_by) },
+                  { label: "Created On", value: formatDate(contract.created_at) },
+                  { label: "Last Updated", value: formatDate(contract.updated_at) },
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{item.label}</p>
-                    <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                    <p className="text-sm font-semibold text-foreground">{item.value || "—"}</p>
                   </div>
                 ))}
               </div>
             </Card>
             <Card className="p-5">
-              <SectionLabel>Key Terms</SectionLabel>
-              <div className="space-y-3">
-                {[
-                  { term: "Payment Terms", detail: "Net-30 from invoice date. Late payment fee of 1.5% per month after 30 days." },
-                  { term: "Scope of Services", detail: "Enterprise IT consulting, managed services, and digital transformation advisory per SOW v2.3." },
-                  { term: "Termination Clause", detail: "Either party may terminate with 90 days written notice. Immediate termination for material breach with 15-day cure period." },
-                  { term: "Liability Cap", detail: "Limited to 12 months of fees paid in the preceding 12-month period. Excludes IP infringement and gross negligence." },
-                ].map((t) => (
-                  <div key={t.term} className="border-l-2 border-blue-200 pl-3.5">
-                    <p className="text-xs font-semibold text-foreground">{t.term}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{t.detail}</p>
-                  </div>
-                ))}
-              </div>
+              <SectionLabel>Description</SectionLabel>
+              {contract.description ? (
+                <p className="text-xs text-muted-foreground leading-relaxed">{contract.description}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground py-2">No description provided for this contract.</p>
+              )}
             </Card>
           </div>
 
           <div className="space-y-4">
             <Card className="p-5">
               <SectionLabel>Contract Duration</SectionLabel>
-              <div className="mb-3">
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Elapsed</span>
-                  <span className="font-mono font-semibold text-foreground">35%</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: "35%" }} />
-                </div>
-                <div className="flex justify-between text-xs mt-1 text-muted-foreground">
-                  <span>{contract.effective}</span>
-                  <span>{contract.expiry}</span>
-                </div>
-              </div>
-              <div className="space-y-2 pt-2 border-t border-border">
-                {[
-                  { label: "Days Elapsed", value: "255" },
-                  { label: "Days Remaining", value: "475" },
-                  { label: "Total Duration", value: "730 days" },
-                ].map((item) => (
-                  <div key={item.label} className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-mono font-semibold text-foreground">{item.value}</span>
+              {duration ? (
+                <>
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Elapsed</span>
+                      <span className="font-mono font-semibold text-foreground">{duration.elapsedPercent}%</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: `${duration.elapsedPercent}%` }} />
+                    </div>
+                    <div className="flex justify-between text-xs mt-1 text-muted-foreground">
+                      <span>{formatDate(contract.start_date)}</span>
+                      <span>{formatDate(contract.end_date)}</span>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </Card>
-
-            <Card className="p-5">
-              <SectionLabel>Approval Workflow</SectionLabel>
-              <div>
-                {APPROVAL_STEPS.map((step, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          step.status === "completed"
-                            ? "bg-emerald-500"
-                            : step.status === "current"
-                            ? "bg-blue-500 ring-3 ring-blue-100"
-                            : "bg-muted border border-border"
-                        }`}
-                      >
-                        {step.status === "completed" && <CheckCircle size={11} className="text-white" />}
-                        {step.status === "current" && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    {[
+                      { label: "Days Elapsed", value: duration.daysElapsed },
+                      { label: "Days Remaining", value: duration.daysRemaining },
+                      { label: "Total Duration", value: `${duration.totalDays} days` },
+                    ].map((item) => (
+                      <div key={item.label} className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">{item.label}</span>
+                        <span className="font-mono font-semibold text-foreground">{item.value}</span>
                       </div>
-                      {i < APPROVAL_STEPS.length - 1 && (
-                        <div
-                          className={`w-px my-0.5 ${step.status === "completed" ? "bg-emerald-300" : "bg-border"}`}
-                          style={{ height: 22 }}
-                        />
-                      )}
-                    </div>
-                    <div className="pb-3 flex-1">
-                      <p className="text-xs font-semibold text-foreground leading-tight">{step.step}</p>
-                      <p className="text-xs text-muted-foreground">{step.person}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{step.date}</p>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground py-2">Start and end dates aren't both set for this contract.</p>
+              )}
             </Card>
           </div>
         </div>
@@ -208,7 +183,7 @@ export function ContractDetail({ contractId, onBack }) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border bg-muted">
-                  {["ID", "Obligation", "Assignee", "Due Date", "Priority", "Status", "Category"].map((h) => (
+                  {["ID", "Obligation", "Assignee", "Due Date", "Priority", "Status", "Type"].map((h) => (
                     <th
                       key={h}
                       className="text-left px-4 py-3 text-muted-foreground font-semibold uppercase tracking-wide whitespace-nowrap"
@@ -223,11 +198,11 @@ export function ContractDetail({ contractId, onBack }) {
                   <tr key={obl.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-4 py-3 font-mono text-muted-foreground">{obl.id}</td>
                     <td className="px-4 py-3 font-semibold text-foreground">{obl.title}</td>
-                    <td className="px-4 py-3 text-foreground">{obl.assignee}</td>
-                    <td className="px-4 py-3 font-mono text-muted-foreground whitespace-nowrap">{obl.due}</td>
+                    <td className="px-4 py-3 text-foreground">{userLabel(obl.assigned_to)}</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground whitespace-nowrap">{formatDate(obl.due_date)}</td>
                     <td className="px-4 py-3">{priorityBadge(obl.priority)}</td>
                     <td className="px-4 py-3">{statusBadge(obl.status)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{obl.category}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{obl.obligation_type || "—"}</td>
                   </tr>
                 ))}
                 {obligations.length === 0 && (
@@ -247,45 +222,31 @@ export function ContractDetail({ contractId, onBack }) {
         <Card className="p-5">
           <SectionLabel>Version History</SectionLabel>
           <div className="divide-y divide-border">
-            {VERSIONS.map((v) => (
-              <div key={v.ver} className="flex items-center gap-4 py-3">
-                <Badge variant="neutral">{v.ver}</Badge>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-foreground">{v.note}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {v.author} · {v.date}
-                  </p>
-                </div>
-                <button className="flex items-center gap-1 text-xs text-blue-600 hover:underline whitespace-nowrap">
-                  <Download size={11} /> Download
-                </button>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {activeTab === "documents" && (
-        <Card className="p-5">
-          <SectionLabel>Attached Documents</SectionLabel>
-          <div className="space-y-2">
-            {DOCUMENTS.map((doc) => (
-              <div key={doc.name} className="flex items-center gap-3 p-3 bg-muted rounded-lg hover:bg-accent transition-colors">
+            {versions.map((v) => (
+              <div key={v.id} className="flex items-center gap-4 py-3">
+                <Badge variant="neutral">v{v.version_number}</Badge>
                 <div className="w-8 h-8 bg-card border border-border rounded flex items-center justify-center flex-shrink-0">
-                  <Paperclip size={12} className="text-muted-foreground" />
+                  <FileText size={12} className="text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {doc.size} · {doc.date}
+                  <p className="text-xs font-semibold text-foreground truncate">
+                    {v.notes || v.document_path.split("/").pop()}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {userLabel(v.uploaded_by)} · {formatDate(v.uploaded_at)}
                   </p>
                 </div>
-                <Badge variant="neutral">{doc.type}</Badge>
-                <button className="text-muted-foreground hover:text-foreground transition-colors">
-                  <Download size={13} />
-                </button>
+                <a
+                  href={v.document_path}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:underline whitespace-nowrap"
+                >
+                  <Download size={11} /> Download
+                </a>
               </div>
             ))}
+            {versions.length === 0 && (
+              <p className="text-xs text-muted-foreground py-4">No versions uploaded for this contract yet.</p>
+            )}
           </div>
         </Card>
       )}
