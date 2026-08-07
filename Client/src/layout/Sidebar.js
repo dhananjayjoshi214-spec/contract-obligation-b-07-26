@@ -1,9 +1,9 @@
 import { FileText, LayoutGrid, ShieldCheck, ClipboardCheck, RefreshCw, BarChart3, Bell, ChevronLeft } from "lucide-react";
 
 const WORKSPACE_ITEMS = [
-  { label: "Dashboard", icon: LayoutGrid, active: true },
+  { label: "Dashboard", icon: LayoutGrid },
   { label: "Compliance", icon: ShieldCheck },
-  { label: "Contract Repository", icon: FileText },
+  { label: "Contract Repository", icon: FileText,  active: true },
   { label: "Obligation Tracker", icon: ClipboardCheck },
 ];
 
