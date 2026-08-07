@@ -1,0 +1,262 @@
+/* ================= REPORT HEADER ================= */
+
+
+/* ================= REPORT HEADER ================= */
+
+.report-header-wrapper{
+
+    background:#ffffff;
+
+    padding:20px 32px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-bottom:1px solid #e2e8f0;
+
+    position:sticky;
+    top:50px;
+    z-index:150;
+
+}
+
+
+
+.report-header-content h2{
+
+    margin:0;
+
+    font-size:26px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+}
+
+
+
+.report-header-content p{
+
+    margin-top:8px;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+
+
+
+
+.report-header-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+
+
+
+.report-search{
+
+    height:40px;
+
+    width:270px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:0 14px;
+
+    background:#f8fafc;
+
+    border:1px solid #dbe3ef;
+
+    border-radius:10px;
+
+}
+
+
+
+.report-search input{
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    width:100%;
+
+    font-size:14px;
+
+}
+
+
+
+
+
+.header-action-btn,
+.icon-action-btn{
+
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:0 14px;
+
+    background:white;
+
+    border:1px solid #dbe3ef;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    color:#334155;
+
+    font-weight:500;
+
+}
+
+
+
+
+
+.icon-action-btn{
+
+    width:42px;
+
+    justify-content:center;
+
+}
+
+
+
+
+
+.export-pdf-btn{
+
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+.export-excel-btn{
+
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#16a34a;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+.header-action-btn:hover,
+.icon-action-btn:hover{
+
+    background:#f8fafc;
+
+}
+
+
+
+.export-pdf-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+
+.export-excel-btn:hover{
+
+    background:#15803d;
+
+}
+
+
+
+
+
+@media(max-width:1200px){
+
+.report-header-wrapper{
+
+    flex-direction:column;
+
+    gap:20px;
+
+    align-items:flex-start;
+
+}
+
+
+
+.report-header-actions{
+
+    flex-wrap:wrap;
+
+}
+
+}

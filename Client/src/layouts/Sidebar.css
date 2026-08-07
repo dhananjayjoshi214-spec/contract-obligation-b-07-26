@@ -1,0 +1,269 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 245px;
+  height: 100vh;
+
+  background: #0f172a;
+  color: #fff;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid rgba(255,255,255,0.06);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-item{
+    height:44px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:500;
+}
+
+.sidebar-item.active{
+    background:#1E293B;
+}
+/* ===========================
+   LOGO
+=========================== */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 58px;
+
+  padding: 0 18px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.logo h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+
+/* ===========================
+   USER CARD
+=========================== */
+
+.user-card {
+  margin: 16px;
+  padding: 14px;
+
+  background: #182338;
+
+  border-radius: 10px;
+}
+
+.signed {
+  color: #7c8ba1;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 10px;
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+
+  color: white;
+
+  margin-bottom: 8px;
+}
+
+.role {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  height: 22px;
+
+  padding: 0 10px;
+
+  background: #2955e8;
+
+  border-radius: 5px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  color: white;
+}
+.export-btn{
+    height:40px;
+    padding:0 18px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+}
+/* ===========================
+   NAVIGATION
+=========================== */
+
+nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  margin: 26px 20px 12px;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  width: 100%;
+
+  height: 42px;
+
+  padding: 0 18px;
+
+  color: #cbd5e1;
+
+  text-decoration: none;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+.menu-item svg {
+  width: 16px;
+  min-width: 16px;
+
+  font-size: 16px;
+
+  color: #94a3b8;
+}
+
+.menu-item:hover {
+  background: #172233;
+  color: white;
+}
+
+.menu-item:hover svg {
+  color: white;
+}
+
+.menu-item.active {
+  background: #1d2d44;
+
+  border-left: 3px solid #2563eb;
+
+  color: white;
+
+  padding-left: 15px;
+}
+
+.menu-item.active svg {
+  color: white;
+}
+
+/* ===========================
+   COLLAPSE
+=========================== */
+.collapse {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 16px 18px;
+
+  border-top: 1px solid rgba(255,255,255,0.06);
+
+  color: #94a3b8;
+  font-size: 14px;
+
+  cursor: pointer;
+
+  background: #0f172a;
+
+  position: sticky;
+  bottom: 0;
+}
+
+.collapse:hover {
+  background: #172233;
+  color: #fff;
+}
+
+.collapse:hover {
+  background: #172233;
+
+  color: white;
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}

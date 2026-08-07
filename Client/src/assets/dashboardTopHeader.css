@@ -1,0 +1,214 @@
+.dashboard-top-header{
+    height:50px;
+    background:#ffffff;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-shrink:0;
+    padding:0 32px;
+
+    border-bottom:1px solid #e5e7eb;
+
+    position:sticky;
+    top:0;
+    z-index:200;
+}
+
+
+
+.header-title-section h1{
+
+    margin:0;
+
+    font-size:14px;
+
+    font-weight:300;
+
+    color:#111827;
+
+}
+
+
+
+.header-title-section p{
+
+    margin-top:6px;
+
+    font-size:14px;
+
+    color:#64748b;
+
+}
+
+
+
+
+
+.header-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:22px;
+
+}
+
+
+
+
+
+.header-search{
+
+    width:320px;
+
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:0 14px;
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:10px;
+
+}
+
+
+
+.header-search input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    font-size:14px;
+
+}
+
+
+
+
+
+.notification-icon{
+
+    position:relative;
+
+    border:none;
+
+    background:white;
+
+    cursor:pointer;
+
+}
+
+
+
+.notification-badge{
+
+    position:absolute;
+
+    top:-8px;
+
+    right:-8px;
+
+    background:#2563eb;
+
+    color:white;
+
+    width:18px;
+
+    height:18px;
+
+    font-size:11px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+
+
+.user-profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+
+.user-avatar{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-weight:700;
+
+}
+
+
+
+.user-details h4{
+
+    margin:0;
+
+    font-size:14px;
+
+    color:#111827;
+
+}
+
+
+
+.user-details p{
+
+    margin:3px 0 0;
+
+    font-size:12px;
+
+    color:#64748b;
+
+}
+
+
+
+.profile-arrow{
+
+    color:#64748b;
+
+}
