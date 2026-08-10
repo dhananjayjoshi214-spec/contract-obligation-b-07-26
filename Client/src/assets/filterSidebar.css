@@ -1,0 +1,241 @@
+/* ================= FIGMA FILTER SIDEBAR ================= */
+
+
+.figma-filter-sidebar{
+
+width:190px;
+
+height:calc(100vh - 160px);
+
+background:#ffffff;
+
+border-right:1px solid #e5e7eb;
+
+display:flex;
+
+flex-direction:column;
+
+position:sticky;
+
+top:0;
+
+}
+
+
+
+
+.figma-filter-header{
+
+
+height:42px;
+
+padding:0 12px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+border-bottom:1px solid #e5e7eb;
+
+color:#2563eb;
+
+font-size:11px;
+
+font-weight:700;
+
+
+}
+
+
+
+.figma-filter-header div{
+
+display:flex;
+
+align-items:center;
+
+gap:6px;
+
+}
+
+
+
+
+
+
+.filter-scroll{
+
+padding:16px 10px;
+
+overflow:hidden;
+
+flex:1;
+
+}
+
+
+
+
+.figma-filter-group{
+
+
+margin-bottom:13px;
+
+
+}
+
+
+
+
+.figma-filter-group label{
+
+
+display:block;
+
+font-size:9px;
+
+letter-spacing:1px;
+
+color:#64748b;
+
+font-weight:700;
+
+margin-bottom:7px;
+
+
+}
+
+
+
+
+.figma-filter-group input,
+.figma-filter-group select{
+
+
+width:100%;
+
+height:28px;
+
+border-radius:7px;
+
+border:1px solid #d9e2ec;
+
+background:#f1f5f9;
+
+padding:0 10px;
+
+font-size:11px;
+
+color:#334155;
+
+outline:none;
+
+
+}
+
+
+
+
+.figma-filter-group input{
+
+margin-bottom:7px;
+
+}
+
+
+
+
+
+.figma-filter-group select{
+
+
+appearance:auto;
+
+cursor:pointer;
+
+
+}
+
+
+
+
+
+
+.filter-footer{
+
+
+padding:12px 10px;
+
+border-top:1px solid #e5e7eb;
+
+background:white;
+
+
+}
+
+
+
+
+.apply-btn{
+
+
+width:100%;
+
+height:28px;
+
+border:none;
+
+border-radius:6px;
+
+background:#2457db;
+
+color:white;
+
+font-size:11px;
+
+font-weight:600;
+
+cursor:pointer;
+
+margin-bottom:8px;
+
+
+}
+
+
+
+
+
+.clear-btn{
+
+
+width:100%;
+
+height:28px;
+
+border-radius:6px;
+
+background:white;
+
+border:1px solid #dbe3ef;
+
+font-size:11px;
+
+cursor:pointer;
+
+color:#334155;
+
+
+}
+.filter-message {
+    margin: 10px 16px;
+    padding: 10px;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}

@@ -1,4 +1,13 @@
 
+import ReportsDashboard from "./pages/ReportsDashboard";
+
+function App() {
+  return <ReportsDashboard />;
+}
+
+export default App;
+
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ComplianceDashboard from "./pages/ComplianceDashboard";
 
@@ -45,3 +54,4 @@ function App() {
 }
 
 export default App;
+

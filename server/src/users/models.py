@@ -1,49 +1,24 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List
-from datetime import datetime
+from sqlalchemy import Column, Integer, String
+from src.database.core import Base
 
-class UserBase(BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    role: str
-    department: Optional[str] = None
-    phone: Optional[str] = None
-    is_active: bool = True
 
-class UserCreate(UserBase):
-    password: str
+class UserRole(Base):
 
-class UserUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[str] = None
-    role: Optional[str] = None
-    department: Optional[str] = None
-    phone: Optional[str] = None
-    is_active: Optional[bool] = None
+    __tablename__ = "user_roles"
 
-class UserResponse(UserBase):
-    id: int
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    id = Column(
+        Integer,
+        primary_key=True
+    )
 
-    class Config:
-        from_attributes = True
+    username = Column(
+        String
+    )
 
-class RoleSchema(BaseModel):
-    id: str
-    name: str
-    description: str
-    users_count: int = 0
-    permissions: List[str] = []
+    role = Column(
+        String
+    )
 
-class ActivityLogSchema(BaseModel):
-    id: int
-    ts: str
-    user: str
-    initials: str
-    activity: str
-    ip: str
-    device: str
-    status: str
+    access = Column(
+        String
+    )

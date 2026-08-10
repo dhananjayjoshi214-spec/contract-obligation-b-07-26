@@ -1,4 +1,9 @@
 node_modules/
+
+__pycache__/
+*.pyc
+.env
+server/src/database/seed_audit_report.py
 build/
 .env
 __pycache__/
@@ -6,3 +11,4 @@ __pycache__/
 .pytest_cache/
 *.db
 .DS_Store
+
