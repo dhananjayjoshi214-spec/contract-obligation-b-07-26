@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, Date, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import relationship
 
 from src.database.core import Base
@@ -13,8 +13,8 @@ class Contract(Base):
     description = Column(Text, nullable=True)
     category = Column(String, nullable=True)
     status = Column(String, nullable=False)
-    start_date = Column(Date, nullable=True)
-    end_date = Column(Date, nullable=True)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
     owner_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
     created_by = Column(BigInteger, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
