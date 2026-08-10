@@ -1,45 +1,24 @@
-from sqlalchemy import Column, Integer, String, Float, Text, DateTime
+from sqlalchemy import BigInteger, Column, Date, DateTime, ForeignKey, String, Text, func
+from sqlalchemy.orm import relationship
+
 from src.database.core import Base
 
 
 class Contract(Base):
     __tablename__ = "contracts"
 
-    # Primary key & Identifiers
-    id = Column(Integer, primary_key=True, index=True)
-    contract_no = Column(String, nullable=True) # e.g. CTR-2024-001
-
-    # Main details
-    title = Column(String, nullable=True)
-    name = Column(String, nullable=True)
+    id = Column(BigInteger, primary_key=True, index=True)
+    contract_no = Column(String, unique=True, nullable=False)
+    title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
-    type = Column(String, nullable=True) # Vendor, Employment, Lease...
     category = Column(String, nullable=True)
-    party = Column(String, nullable=True) # Counterparty
-    status = Column(String, nullable=True) # Active, Expiring Soon, Under Review, Draft, Terminated
+    status = Column(String, nullable=False)
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
+    owner_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    created_by = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Dates
-    start_date = Column(DateTime, nullable=True)
-    end_date = Column(DateTime, nullable=True)
-    effective = Column(String, nullable=True) # ISO date string
-    expiry = Column(String, nullable=True)
-
-    # Ownership & Values
-    owner = Column(String, nullable=True)
-    owner_id = Column(Integer, nullable=True)
-    value = Column(String, nullable=True) # kept as display string e.g. "$2,400,000"
-
-    # Legal & Terms
-    governing_law = Column(String, default="State of Delaware, USA")
-    jurisdiction = Column(String, default="US Federal Court")
-    auto_renewal = Column(String, default="Yes - 60 days notice")
-
-    # Audit & Tracking
-    created_by = Column(Integer, nullable=True)
-    created_at = Column(DateTime, nullable=True)
-    updated_at = Column(DateTime, nullable=True)
-
-    # Convenience helper to retrieve contract title/name seamlessly
-    @property
-    def display_title(self):
-        return self.title or self.name or ""
+    owner = relationship("User", foreign_keys=[owner_id])
+    creator = relationship("User", foreign_keys=[created_by])
