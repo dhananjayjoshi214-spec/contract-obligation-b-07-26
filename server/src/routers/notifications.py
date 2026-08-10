@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.database.core import get_db
 from src.entities.notification import Notification
 
-router = APIRouter()
+router = APIRouter(prefix="/api", tags=["notifications"])
 
 
 @router.get("/notifications")
