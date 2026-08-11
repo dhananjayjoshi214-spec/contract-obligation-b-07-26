@@ -1,72 +1,168 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy import func, or_
+from sqlalchemy.orm import Session, joinedload
 
-from src.contracts.models import ContractCreate, ContractUpdate
 from src.entities.contract import Contract
+from src.entities.obligation import Obligation
+from src.entities.user import User
 from src.exceptions import NotFoundException
+from src.obligations.models import ObligationCreate, ObligationUpdate
 
 
-def get_contracts(
-    db: Session,
-    search: Optional[str] = None,
-    category_filter: Optional[str] = None,
-    status_filter: Optional[str] = None,
-) -> list[Contract]:
-    query = db.query(Contract)
-    if search:
-        term = f"%{search.strip()}%"
-        query = query.filter(or_(Contract.contract_no.ilike(term), Contract.title.ilike(term), Contract.category.ilike(term)))
-    if category_filter:
-        query = query.filter(Contract.category == category_filter)
-    if status_filter:
-        query = query.filter(Contract.status == status_filter)
-    return query.order_by(Contract.id.asc()).all()
+def _reference(obligation_id: int) -> str:
+    return f"OBL-{obligation_id:03d}"
 
 
-def get_contract(db: Session, contract_id: int) -> Contract:
-    contract = db.query(Contract).filter(Contract.id == contract_id).first()
-    if not contract:
-        raise NotFoundException(f"Contract {contract_id} was not found")
-    return contract
+def _serialize(obligation: Obligation) -> dict:
+    assignee = None
 
+    if obligation.assignee:
+        first_name = obligation.assignee.first_name or ""
+        last_name = obligation.assignee.last_name or ""
 
-def get_summary(db: Session, filtered_count: int) -> dict:
-    today = date.today()
-    upcoming_date = today + timedelta(days=30)
+        assignee = {
+            "id": obligation.assignee.id,
+            "name": " ".join(
+                part for part in (first_name, last_name) if part
+            ),
+            "initials": f"{first_name[:1]}{last_name[:1]}".upper(),
+            "color_index": obligation.assignee.id % 5,
+        }
+
     return {
-        "total": db.query(Contract).count(),
-        "active": db.query(Contract).filter(Contract.status == "Active").count(),
-        "expiring_soon": db.query(Contract).filter(
-            Contract.end_date.between(
-                datetime.combine(today, datetime.min.time()),
-                datetime.combine(upcoming_date, datetime.max.time()),
-            )
-        ).count(),
-        "showing": filtered_count,
+        "id": obligation.id,
+        "reference": _reference(obligation.id),
+        "title": obligation.title,
+        "contract": obligation.contract.title if obligation.contract else "",
+        "assignee": assignee,
+        "due_date": obligation.due_date.date() if obligation.due_date else None,
+        "priority": obligation.priority,
+        "status": obligation.status,
+        "category": obligation.obligation_type,
     }
 
 
-def create_contract(db: Session, payload: ContractCreate) -> Contract:
-    contract = Contract(**payload.model_dump())
-    db.add(contract)
+def get_obligations(
+    db: Session,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+) -> list[dict]:
+    query = db.query(Obligation).options(
+        joinedload(Obligation.contract),
+        joinedload(Obligation.assignee),
+    )
+
+    if status:
+        query = query.filter(Obligation.status == status)
+
+    if search:
+        term = f"%{search.strip()}%"
+        query = query.join(Contract).filter(
+            or_(
+                Obligation.title.ilike(term),
+                Contract.title.ilike(term),
+            )
+        )
+
+    obligations = query.order_by(Obligation.id.asc()).all()
+    return [_serialize(obligation) for obligation in obligations]
+
+
+def get_obligation(db: Session, obligation_id: int) -> Obligation:
+    obligation = (
+        db.query(Obligation)
+        .options(
+            joinedload(Obligation.contract),
+            joinedload(Obligation.assignee),
+        )
+        .filter(Obligation.id == obligation_id)
+        .first()
+    )
+
+    if not obligation:
+        raise NotFoundException(f"Obligation {obligation_id} was not found")
+
+    return obligation
+
+
+def create_obligation(db: Session, payload: ObligationCreate) -> dict:
+    values = payload.model_dump()
+
+    if values["due_date"] is not None:
+        values["due_date"] = datetime.combine(
+            values["due_date"],
+            datetime.min.time(),
+        )
+
+    obligation = Obligation(**values)
+    db.add(obligation)
     db.commit()
-    db.refresh(contract)
-    return contract
+
+    return _serialize(get_obligation(db, obligation.id))
 
 
-def update_contract(db: Session, contract_id: int, payload: ContractUpdate) -> Contract:
-    contract = get_contract(db, contract_id)
+def update_obligation(
+    db: Session,
+    obligation_id: int,
+    payload: ObligationUpdate,
+) -> dict:
+    obligation = get_obligation(db, obligation_id)
+
     for field, value in payload.model_dump(exclude_unset=True).items():
-        setattr(contract, field, value)
+        if field in {"due_date", "completed_date"} and value is not None:
+            value = datetime.combine(value, datetime.min.time())
+
+        setattr(obligation, field, value)
+
     db.commit()
-    db.refresh(contract)
-    return contract
+    return _serialize(get_obligation(db, obligation.id))
 
 
-def delete_contract(db: Session, contract_id: int) -> None:
-    contract = get_contract(db, contract_id)
-    db.delete(contract)
+def delete_obligation(db: Session, obligation_id: int) -> None:
+    obligation = get_obligation(db, obligation_id)
+    db.delete(obligation)
     db.commit()
+
+
+def get_summary(db: Session) -> list[dict]:
+    status_order = [
+        "Pending",
+        "In Progress",
+        "Under Review",
+        "Completed",
+        "Overdue",
+    ]
+
+    counts = dict(
+        db.query(Obligation.status, func.count(Obligation.id))
+        .group_by(Obligation.status)
+        .all()
+    )
+
+    return [
+        {"status": status, "count": counts.get(status, 0)}
+        for status in status_order
+    ]
+
+
+def get_display_user(db: Session) -> Optional[dict]:
+    user = (
+        db.query(User)
+        .filter(User.is_active.is_(True))
+        .order_by(User.id.asc())
+        .first()
+    )
+
+    if not user:
+        return None
+
+    return {
+        "id": user.id,
+        "name": " ".join(
+            part for part in (user.first_name, user.last_name) if part
+        ),
+        "role": user.role,
+        "initials": f"{(user.first_name or '')[:1]}{(user.last_name or '')[:1]}".upper(),
+    }
