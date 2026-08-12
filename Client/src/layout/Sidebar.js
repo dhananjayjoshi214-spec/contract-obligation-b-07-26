@@ -30,35 +30,42 @@ function NavGroup({ title, items }) {
   );
 }
 
-export function Sidebar({ userName = "Sarah Chen", userRole = "Legal Manager" }) {
+function Sidebar({ open, onToggle }) {
   return (
-    <aside className="w-60 bg-sidebar flex flex-col p-3 flex-shrink-0 min-h-screen">
-      <div className="flex items-center gap-2 px-2 py-3 mb-2">
-        <div className="w-7 h-7 bg-primary rounded flex items-center justify-center">
-          <FileText size={15} className="text-white" />
-        </div>
-        <span className="text-sidebar-foreground font-bold text-sm">ContractIQ</span>
+    <aside className={`sidebar ${open ? 'open' : 'closed'}`}>
+      <div className="sidebar-brand">
+        <div className="brand-mark">CI</div>
+        {open && <div className="brand-text">ContractIQ</div>}
       </div>
 
-      <div className="px-3 py-2 mb-4 border-b border-sidebar-border">
-        <p className="text-[10px] text-sidebar-muted uppercase tracking-wider mb-1">Signed in as</p>
-        <p className="text-sm text-sidebar-foreground font-semibold">{userName}</p>
-        <span className="inline-block mt-1 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-semibold rounded">
-          {userRole}
-        </span>
-      </div>
-
-      <NavGroup title="Workspace" items={WORKSPACE_ITEMS} />
-      <NavGroup title="Renewals" items={RENEWAL_ITEMS} />
-      <NavGroup title="Reports" items={REPORT_ITEMS} />
-      <NavGroup title="Tools" items={TOOL_ITEMS} />
-
-      <div className="mt-auto pt-3 border-t border-sidebar-border">
-        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground transition-colors">
-          <ChevronLeft size={14} />
-          Collapse sidebar
+      <nav className="sidebar-nav">
+        <button className="nav-item active">
+          <span className="nav-icon">{icons.renewals}</span>
+          {open && <span>Renewal Management</span>}
         </button>
-      </div>
+        <button className="nav-item">
+          <span className="nav-icon">{icons.repository}</span>
+          {open && <span>Contract Repository</span>}
+        </button>
+        <button className="nav-item">
+          <span className="nav-icon">{icons.compliance}</span>
+          {open && <span>Compliance</span>}
+        </button>
+        <button className="nav-item">
+          <span className="nav-icon">{icons.notifications}</span>
+          {open && <span>Notification Center</span>}
+        </button>
+        <button className="nav-item">
+          <span className="nav-icon">{icons.admin}</span>
+          {open && <span>Admin Panel</span>}
+        </button>
+      </nav>
+
+      <button className="sidebar-toggle" onClick={onToggle}>
+        {open ? 'Collapse Sidebar' : 'Expand Sidebar'}
+      </button>
     </aside>
-  );
+  )
 }
+
+export default Sidebar

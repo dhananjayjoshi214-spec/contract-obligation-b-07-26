@@ -1,0 +1,226 @@
+/* ===========================
+   APP LAYOUT
+=========================== */
+
+.app-layout{
+    display:flex;
+    min-height:100vh;
+    background:#f5f7fb;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.app-sidebar{
+    width:260px;
+    background:#111827;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:24px 18px;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:35px;
+    color:#ffffff;
+}
+
+.app-sidebar nav{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.sidebar-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 16px;
+    border-radius:12px;
+    color:#cbd5e1;
+    cursor:pointer;
+    transition:.25s;
+    font-size:15px;
+    font-weight:500;
+}
+
+.sidebar-item svg{
+    font-size:19px;
+}
+
+.sidebar-item:hover{
+    background:#1f2937;
+    color:white;
+}
+
+.sidebar-item.active{
+    background:#2563eb;
+    color:white;
+}
+
+.sidebar-footer{
+    border-top:1px solid rgba(255,255,255,.08);
+    padding-top:18px;
+}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.user-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#2563eb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-weight:700;
+}
+
+.user-box h5{
+    color:white;
+    margin:0;
+    font-size:15px;
+}
+
+.user-box p{
+    margin:2px 0 0;
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.collapse{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#94a3b8;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.collapse:hover{
+    color:white;
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
+
+.main-content{
+    flex:1;
+    margin-left:260px;
+    min-height:100vh;
+    background:#f8fafc;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.app-header{
+    height:72px;
+    background:#ffffff;
+    border-bottom:1px solid #e5e7eb;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 32px;
+
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.search-input{
+    width:320px;
+    height:42px;
+
+    border:1px solid #d1d5db;
+    border-radius:10px;
+
+    padding:0 16px;
+
+    font-size:14px;
+}
+
+.search-input:focus{
+    outline:none;
+    border-color:#2563eb;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:24px;
+}
+
+.header-icon{
+    width:42px;
+    height:42px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#f3f4f6;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+
+    font-size:20px;
+}
+
+.header-user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.header-avatar{
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    color:white;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-weight:700;
+}
+
+.header-user h5{
+    margin:0;
+    font-size:15px;
+}
+
+.header-user p{
+    margin:2px 0 0;
+    color:#6b7280;
+    font-size:13px;
+}
+
+.page-content{
+    padding:30px;
+}
