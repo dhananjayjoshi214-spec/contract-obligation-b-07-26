@@ -1,57 +1,42 @@
+import { Routes, Route, Navigate, Link } from "react-router-dom";
 
-import ReportsDashboard from "./pages/ReportsDashboard";
-
-function App() {
-  return <ReportsDashboard />;
-}
-
-export default App;
-
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ComplianceDashboard from "./pages/ComplianceDashboard";
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ComplianceDashboard />} />
-        <Route path="/compliance" element={<ComplianceDashboard />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;import { Routes, Route, Navigate } from "react-router-dom";
-
-import ComplianceDashboard from "./pages/ComplianceDashboard";
-
+// --- IMPORT ONLY YOUR WORK ---
 import AdminLayout from "./layout/AdminLayout";
-import Dashboard from "./features/admin/pages/Dashboard";
 import Users from "./features/admin/pages/Users";
-import ActivityLogs from "./features/admin/pages/ActivityLogs";
-import Notifications from "./features/admin/pages/Notifications";
-import Settings from "./features/admin/pages/Settings";
 
-function App() {
+// ⚠️ IMPORTANT: Update this path if your Renewal Dashboard is in a different folder!
+import RenewalDashboard from "./pages/RenewalDashboard"; 
+
+// --- SIMPLE NAVIGATION BAR ---
+function MentorNavBar() {
   return (
-    <Routes>
-      {/* Existing routes */}
-      <Route path="/" element={<ComplianceDashboard />} />
-      <Route path="/compliance" element={<ComplianceDashboard />} />
-
-      {/* Your Admin Panel */}
-      <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
-      <Route path="/admin/users" element={<AdminLayout><Users /></AdminLayout>} />
-      <Route path="/admin/activity-logs" element={<AdminLayout><ActivityLogs /></AdminLayout>} />
-      <Route path="/admin/notifications" element={<AdminLayout><Notifications /></AdminLayout>} />
-      <Route path="/admin/settings" element={<AdminLayout><Settings /></AdminLayout>} />
-
-      {/* Optional redirect */}
-      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-    </Routes>
+    <div style={{ padding: '15px', background: '#002855', color: 'white', display: 'flex', gap: '20px', marginBottom: '20px', alignItems: 'center' }}>
+      <h3 style={{ margin: 0, paddingRight: '20px', borderRight: '2px solid white' }}>My Project Work</h3>
+      <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', padding: '5px 10px', background: '#005b9f', borderRadius: '4px' }}>
+        👤 User Management
+      </Link>
+      <Link to="/renewal" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', padding: '5px 10px', background: '#005b9f', borderRadius: '4px' }}>
+        🔄 Renewal Dashboard
+      </Link>
+    </div>
   );
 }
 
-export default App;
+// --- MAIN APP (LOCKED TO YOUR WORK) ---
+export default function App() {
+  return (
+    <div>
+      <MentorNavBar />
+      <Routes>
+        {/* Make User Management the default home page */}
+        <Route path="/" element={<AdminLayout><Users /></AdminLayout>} />
+        
+        {/* Your Renewal Dashboard */}
+        <Route path="/renewal" element={<RenewalDashboard />} />
 
+        {/* If the mentor clicks anything else, redirect them back to your work */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
+  );
+}
